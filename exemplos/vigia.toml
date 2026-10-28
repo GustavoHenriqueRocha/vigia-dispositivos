@@ -1,0 +1,56 @@
+# Monte a lista com `vigia-dispositivos listar --toml` e ajuste os nomes.
+
+[geral]
+intervalo = 5               # segundos entre rodadas
+tolerancia_queda = 15       # ausente só depois de 15 s seguidos (reconexões rápidas não alarmam)
+tolerancia_volta = 3        # presente de novo só depois de 3 s seguidos
+banco = "vigia.db"          # histórico de eventos e quedas (SQLite)
+status_host = "127.0.0.1"
+status_porta = 8791         # GET / (página) e GET /status (JSON)
+
+# Conversor USB-serial de uma balança, reconhecido por VID:PID e número de série.
+[[dispositivo]]
+nome = "balanca-expedicao"
+id = "0403:6001"
+serial = "A10K3XYZ"
+
+# CLP ligado por USB: basta parte do nome do produto. Se a porta ficar 2 min sem
+# dados, vira "mudo". Aqui a leitura é feita no arquivo que o coletor já grava,
+# sem disputar a porta com ele.
+[[dispositivo]]
+nome = "clp-linha-2"
+produto = "PLC"
+tolerancia_queda = 30
+silencio = { tipo = "arquivo", caminho = "/var/log/coletor/linha-2.log", max = 120 }
+
+# Leitor de código de barras USB-serial (CDC ACM), reconhecido pela porta estável.
+[[dispositivo]]
+nome = "leitor-codigo"
+porta = "/dev/serial/by-id/usb-*Scanner*"
+
+# Conversor serial/Ethernet que transmite sozinho: sem USB, só rede. Recusou conexão
+# = ausente; conectou mas nada chegou em 60 s = mudo.
+[[dispositivo]]
+nome = "conversor-serial-ethernet"
+silencio = { tipo = "tcp", host = "10.0.0.20", porta = 4001, janela = 2, max = 60 }
+
+[[notificar]]
+tipo = "log"
+arquivo = "vigia-eventos.log"
+max_bytes = 1_000_000
+copias = 5
+
+[[notificar]]
+tipo = "webhook"
+url = "http://127.0.0.1:9000/eventos"
+cabecalhos_env = { Authorization = "VIGIA_WEBHOOK_AUTH" }   # valor vem do ambiente
+
+# Token e chat vêm de variáveis de ambiente; sem elas, o Telegram fica desligado com aviso.
+[[notificar]]
+tipo = "telegram"
+token_env = "VIGIA_TELEGRAM_TOKEN"
+chat_env = "VIGIA_TELEGRAM_CHAT"
+
+[[notificar]]
+tipo = "comando"
+comando = ["logger", "-t", "vigia-dispositivos", "{mensagem}"]

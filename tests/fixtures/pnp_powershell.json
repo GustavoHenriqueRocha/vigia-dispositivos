@@ -1,0 +1,9 @@
+[{"InstanceId":"USB\\ROOT_HUB30\\4&1A2B3C4D&0&0","FriendlyName":"USB Root Hub (USB 3.0)","Manufacturer":"(Standard USB HUBs)","Class":"USB","Status":"OK"},
+{"InstanceId":"USB\\VID_05E3&PID_0610\\5&11AA22BB&0&9","FriendlyName":"Generic USB Hub","Manufacturer":"(Standard USB HUBs)","Class":"USB","Status":"OK"},
+{"InstanceId":"USB\\VID_0403&PID_6001\\A10K3XYZ","FriendlyName":"USB Serial Converter","Manufacturer":"FTDI","Class":"USB","Status":"OK"},
+{"InstanceId":"FTDIBUS\\VID_0403+PID_6001+A10K3XYZA\\0000","FriendlyName":"USB Serial Port (COM3)","Manufacturer":"FTDI","Class":"Ports","Status":"OK"},
+{"InstanceId":"USB\\VID_1A86&PID_7523\\5&2D3B1F0&0&3","FriendlyName":"USB-SERIAL CH340 (COM4)","Manufacturer":"wch.cn","Class":"Ports","Status":"OK"},
+{"InstanceId":"USB\\VID_2341&PID_8036\\6&3F00AA11&0&2","FriendlyName":"USB Composite Device","Manufacturer":"(Standard USB Host Controller)","Class":"USB","Status":"OK"},
+{"InstanceId":"USB\\VID_2341&PID_8036&MI_00\\7&1C2D3E4F&0&0000","FriendlyName":"Dispositivo Serial USB (COM7)","Manufacturer":"Microsoft","Class":"Ports","Status":"OK"},
+{"InstanceId":"USB\\VID_2341&PID_8036&MI_02\\7&1C2D3E4F&0&0002","FriendlyName":"Dispositivo de Entrada USB","Manufacturer":"(Standard system devices)","Class":"HIDClass","Status":"OK"},
+{"InstanceId":"USB\\VID_046D&PID_C52B\\6&9988&0&1","FriendlyName":"USB Receiver","Manufacturer":"Logitech","Class":"USB","Status":"OK"}]

@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vigia-dispositivos"
+version = "0.1.0"
+description = "Avisa quando um dispositivo USB ou serial esperado some, volta ou fica mudo, com histórico de quedas"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Gustavo Henrique Rocha" }]
+keywords = ["usb", "serial", "monitoring", "watchdog", "industrial", "telegram"]
+
+[project.scripts]
+vigia-dispositivos = "vigia_dispositivos.__main__:main"
+
+[tool.setuptools]
+packages = ["vigia_dispositivos"]
