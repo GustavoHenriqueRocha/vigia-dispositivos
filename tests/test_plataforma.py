@@ -50,6 +50,7 @@ def montar_sys(raiz):
     return sysd, dev
 
 
+@unittest.skipIf(os.name == "nt", "a /sys falsa usa ':' nos nomes de pasta e symlinks, que o Windows não aceita")
 class TestLinux(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

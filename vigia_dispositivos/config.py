@@ -7,6 +7,16 @@ from pathlib import Path
 from . import notificadores as notif
 from . import silencio
 
+def ler_toml(caminho):
+    """TOML de um arquivo; aceita o UTF-16 que o `>` do PowerShell 5 grava e UTF-8 com BOM."""
+    bruto = Path(caminho).read_bytes()
+    if bruto.startswith((b"\xff\xfe", b"\xfe\xff")):
+        texto = bruto.decode("utf-16")
+    else:
+        texto = bruto.decode("utf-8-sig")
+    return tomllib.loads(texto)
+
+
 PADROES = {"intervalo": 5.0, "tolerancia_queda": 15.0, "tolerancia_volta": 3.0}
 
 
@@ -93,7 +103,7 @@ def esperado_de(d, geral):
 
 def carregar(caminho, ambiente=None):
     """→ (geral, esperados, notificadores)."""
-    dados = tomllib.loads(Path(caminho).read_text(encoding="utf-8"))
+    dados = ler_toml(caminho)
     geral = {**PADROES, **dados.get("geral", {})}
     esperados = [esperado_de(d, geral) for d in dados.get("dispositivo", [])]
     if not esperados:

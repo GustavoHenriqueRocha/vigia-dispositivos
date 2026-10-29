@@ -9,7 +9,7 @@ import tomllib
 from pathlib import Path
 
 from . import __version__, plataforma
-from .config import carregar
+from .config import carregar, ler_toml
 from .estado import duracao
 from .historico import Historico
 from .servidor import servir
@@ -21,8 +21,12 @@ def cmd_listar(a):
     if a.json:
         print(json.dumps([d.como_dict() for d in dispositivos], ensure_ascii=False, indent=1))
     elif a.toml:
+        usados = {}
         for d in dispositivos:
             nome = (d.produto or d.id).lower().replace(" ", "-")
+            usados[nome] = usados.get(nome, 0) + 1
+            if usados[nome] > 1:            # dois "USB Input Device" no Windows: a config recusa nome repetido
+                nome = f"{nome}-{usados[nome]}"
             print("[[dispositivo]]")
             print(f"nome = {json.dumps(nome, ensure_ascii=False)}")
             print(f'id = "{d.id}"')
@@ -73,7 +77,7 @@ def cmd_vigiar(a):
 def cmd_historico(a):
     banco = a.banco
     if not banco and a.config:
-        dados = tomllib.loads(Path(a.config).read_text(encoding="utf-8"))
+        dados = ler_toml(a.config)
         banco = dados.get("geral", {}).get("banco", "vigia.db")
     banco = banco or "vigia.db"
     if not Path(banco).exists():

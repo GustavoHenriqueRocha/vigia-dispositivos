@@ -236,6 +236,30 @@ class TestCLI(unittest.TestCase):
         import tomllib
         self.assertEqual(len(tomllib.loads(toml)["dispositivo"]), 2, "saída --toml é TOML válido")
 
+    def test_toml_com_produtos_iguais_vira_config_valida(self):
+        # no Windows dois HID aparecem como "USB Input Device"; antes os dois saíam com o mesmo nome
+        # e o vigiar recusava a config colada ("nomes repetidos")
+        hid1 = Dispositivo("0eef", "c000", "", "USB Input Device", "", [])
+        hid2 = Dispositivo("0483", "0011", "", "USB Input Device", "", [])
+        with mock.patch("vigia_dispositivos.plataforma.listar", return_value=[hid1, hid2]):
+            _, toml = self.rodar("listar", "--toml")
+        with tempfile.TemporaryDirectory() as tmp:
+            arq = Path(tmp) / "c.toml"
+            arq.write_text(toml, encoding="utf-8")
+            _, esperados, _ = carregar(arq, ambiente={})
+        self.assertEqual([e.nome for e in esperados], ["usb-input-device", "usb-input-device-2"])
+
+    def test_config_em_utf16_do_powershell(self):
+        # `listar --toml > vigia.toml` no PowerShell 5 grava UTF-16 com BOM; antes dava
+        # "'utf-8' codec can't decode byte 0xff"
+        toml = '[[dispositivo]]\nnome = "balança"\nid = "0403:6001"\n'
+        with tempfile.TemporaryDirectory() as tmp:
+            for codif in ("utf-16", "utf-8-sig"):
+                arq = Path(tmp) / f"{codif}.toml"
+                arq.write_text(toml, encoding=codif)
+                _, esperados, _ = carregar(arq, ambiente={})
+                self.assertEqual(esperados[0].nome, "balança", codif)
+
     def test_historico(self):
         with tempfile.TemporaryDirectory() as tmp:
             banco = Path(tmp) / "h.db"
