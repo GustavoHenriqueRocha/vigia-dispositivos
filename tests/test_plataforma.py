@@ -9,6 +9,12 @@ from vigia_dispositivos import plataforma
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
 
 
+def ler_wmic():
+    # Path.read_text(newline=) só existe a partir do Python 3.13
+    with open(FIXTURES / "wmic.csv", encoding="utf-8", newline="") as f:
+        return f.read()
+
+
 def montar_sys(raiz):
     """Árvore /sys e /dev falsa: hub raiz, conversor FTDI com by-id, CDC ACM sem by-id,
     teclado sem serial e uma interface (1-1:1.0) que não pode virar aparelho."""
@@ -99,7 +105,7 @@ class TestWindows(unittest.TestCase):
         self.assertEqual(plataforma.parse_powershell("  "), [])
 
     def test_wmic(self):
-        registros = plataforma.parse_wmic((FIXTURES / "wmic.csv").read_text(newline=""))
+        registros = plataforma.parse_wmic(ler_wmic())
         self.assertTrue(all(r["id"].upper().startswith(("USB", "FTDIBUS")) for r in registros))
         ds = {d.id: d for d in plataforma.montar_windows(registros)}
         self.assertEqual(sorted(ds), ["0403:6001", "1a86:7523"])
@@ -112,7 +118,7 @@ class TestWindows(unittest.TestCase):
             chamados.append(cmd[0])
             if cmd[0] == "powershell":
                 raise subprocess.CalledProcessError(1, cmd)
-            return (FIXTURES / "wmic.csv").read_text(newline="")
+            return ler_wmic()
 
         ds = plataforma.listar_windows(executar)
         self.assertEqual(chamados, ["powershell", "wmic"])
